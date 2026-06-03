@@ -298,7 +298,7 @@ jobs:
             
             # Step 6: Log in to Docker Hub
             - name: Log in to Docker Hub
-              uses: docker/login-action@v3   
+              uses: docker/login-action@v4
               with:
                   username: ${{ secrets.DOCKER_USERNAME }}   # Use Docker Hub username from secrets
                   password: ${{ secrets.DOCKER_PASSWORD }}   # Use Docker Hub password from secrets
