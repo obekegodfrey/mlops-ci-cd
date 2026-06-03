@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Large ML Model checkpoints/artifacts (don't push heavy binaries to GitHub)
+*.pkl
+*.h5
+*.joblib
+
+# OS generated files
+.DS_Store
+Thumbs.db

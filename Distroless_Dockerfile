@@ -1,0 +1,47 @@
+# ==========================================
+# STAGE 1: Build & Dependency Installation
+# ==========================================
+FROM python:3.12-slim AS builder
+
+# Prevent Python from writing .pyc files and enable unbuffered logging
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install build-essential or extra system dependencies if packages require compilation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and install dependencies into a dedicated site-packages directory
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# ==========================================
+# STAGE 2: Final Secure Distroless Runtime
+# ==========================================
+# Google's Python 3 distroless image is based on Debian
+FROM gcr.io/distroless/python3-debian12
+
+WORKDIR /app
+
+# Copy installed Python packages from the builder stage
+COPY --from=builder /install /usr/local
+
+# Copy application source code and the pre-trained model artifact
+COPY src/ ./src/
+COPY iris_model.pkl /app/iris_model.pkl
+
+# Expose the application port
+EXPOSE 8000
+
+# Set Python path to ensure the container can resolve app imports smoothly
+ENV PYTHONPATH=/app
+
+# Command to execute the application
+# Note: Because distroless lacks a shell (like sh or bash), we use the vector/exec form 
+# and point directly to the uvicorn module inside the python interpreter.
+CMD ["-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
