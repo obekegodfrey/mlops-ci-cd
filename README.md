@@ -1,6 +1,6 @@
 # MLOps Project — Step 1: Raw Materials (Dataset & Code)
 
-Welcome to the foundational step of the MLOps pipeline. This phase establishes the core machine learning logic and application code. This repository sets up a lightweight, robust ML application using **FastAPI** to serve a **Logistic Regression** model trained on the classic **Iris dataset**. 
+Welcome to the step of the MLOps pipeline. This repository sets up a lightweight, robust ML application using **FastAPI** to serve a **Logistic Regression** model trained on the classic **Iris dataset**. 
 
 The design maintains a minimal footprint, keeping dependencies and the final Docker image optimized for standard cloud deployment environments (such as the AWS Free Tier limits).
 
@@ -114,9 +114,9 @@ Initialize your virtual environment and resolve dependencies:
 
 ```
 # Create a virtual environment
-python3 -m venv .venv
+python -m venv .venv
 
-# Activate the virtual environment
+# Activate the virtual environment 0n linux
 source .venv/bin/activate
 
 # Upgrade package manager and install dependencies
