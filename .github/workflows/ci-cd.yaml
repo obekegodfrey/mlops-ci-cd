@@ -45,7 +45,7 @@ jobs:
                   echo "=== Src Directory Files ==="
                   ls -la src/
             # Step 5: Build Docker image
-            - name: Build Docker image
+            - name: Build Docker image # Build a Docker image using the Dockerfile in the repository
               run: |
                   docker build -t mlops-ci-cd .   # Build a Docker image
             
