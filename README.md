@@ -268,11 +268,11 @@ jobs:
         steps:
             # Step 1: Check out the code
             - name: Checkout code
-              uses: actions/checkout@v6  # Updated to v5 (Supports Node 24+)
+              uses: actions/checkout@v6 #  Updated to v6 (Supports Node 24+)
             
             # Step 2: Set up Python environment
             - name: Set up Python
-              uses: actions/setup-python@v6  # Updated to v5 (Supports Node 24+)
+              uses: actions/setup-python@v6   #  Updated to v6 (Supports Python 3.12)
               with:
                   python-version: '3.12'   # Specify the Python version to use
             
@@ -286,9 +286,11 @@ jobs:
             # Step 4: Run tests
             - name: Run tests
               run: |
-                  pytest tests/   # Run tests using pytest
                   pytest --maxfail=1 --disable-warnings -q || echo "Tests failed or no tests found, skipping..."   # Run tests with specific options
-            
+            # Train the model so iris_model.pkl is created in the runner environment
+            - name: Train Machine Learning Model
+              run: |
+                  python src/model.py
             # Step 5: Build Docker image
             - name: Build Docker image
               run: |
@@ -296,7 +298,7 @@ jobs:
             
             # Step 6: Log in to Docker Hub
             - name: Log in to Docker Hub
-              uses: docker/login-action@v3   # Updated to v3 (Supports Node 24+)
+              uses: docker/login-action@v3   
               with:
                   username: ${{ secrets.DOCKER_USERNAME }}   # Use Docker Hub username from secrets
                   password: ${{ secrets.DOCKER_PASSWORD }}   # Use Docker Hub password from secrets
@@ -305,7 +307,7 @@ jobs:
             - name: Push Docker image
               run: |
                   docker tag mlops-ci-cd:latest ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest   # Tag the Docker image
-                  docker push ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest   # Push the Docker image to Docker Hub   
+                  docker push ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest   # Push the Docker image to Docker Hub  
                                 
 ```
 ### 3.2 Commands to Trigger CI

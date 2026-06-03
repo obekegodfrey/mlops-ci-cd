@@ -36,7 +36,10 @@ jobs:
             - name: Run tests
               run: |
                   pytest --maxfail=1 --disable-warnings -q || echo "Tests failed or no tests found, skipping..."   # Run tests with specific options
-            
+            # Train the model so iris_model.pkl is created in the runner environment
+            - name: Train Machine Learning Model
+              run: |
+                  python src/model.py
             # Step 5: Build Docker image
             - name: Build Docker image
               run: |
