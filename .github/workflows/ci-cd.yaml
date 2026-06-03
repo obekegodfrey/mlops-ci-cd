@@ -60,4 +60,4 @@ jobs:
             - name: Push Docker image
               run: |
                   docker tag mlops-ci-cd:latest ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest
-                  docker push ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest   # Tag and push the Docker image to Docker Hub
+                  docker push ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest
