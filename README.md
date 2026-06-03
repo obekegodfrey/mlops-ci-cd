@@ -268,11 +268,11 @@ jobs:
         steps:
             # Step 1: Check out the code
             - name: Checkout code
-              uses: actions/checkout@v5   # 👈 Updated to v5 (Supports Node 24+)
+              uses: actions/checkout@v6  # Updated to v5 (Supports Node 24+)
             
             # Step 2: Set up Python environment
             - name: Set up Python
-              uses: actions/setup-python@v5   # 👈 Updated to v5 (Supports Node 24+)
+              uses: actions/setup-python@v6  # Updated to v5 (Supports Node 24+)
               with:
                   python-version: '3.12'   # Specify the Python version to use
             
@@ -296,7 +296,7 @@ jobs:
             
             # Step 6: Log in to Docker Hub
             - name: Log in to Docker Hub
-              uses: docker/login-action@v3   # 👈 Updated to v3 (Supports Node 24+)
+              uses: docker/login-action@v3   # Updated to v3 (Supports Node 24+)
               with:
                   username: ${{ secrets.DOCKER_USERNAME }}   # Use Docker Hub username from secrets
                   password: ${{ secrets.DOCKER_PASSWORD }}   # Use Docker Hub password from secrets

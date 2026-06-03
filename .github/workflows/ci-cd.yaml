@@ -17,11 +17,11 @@ jobs:
         steps:
             # Step 1: Check out the code
             - name: Checkout code
-              uses: actions/checkout@v6 # 👈 Updated to v6 (Supports Node 24+)
+              uses: actions/checkout@v6 #  Updated to v6 (Supports Node 24+)
             
             # Step 2: Set up Python environment
             - name: Set up Python
-              uses: actions/setup-python@v6   # 👈 Updated to v6 (Supports Python 3.12)
+              uses: actions/setup-python@v6   #  Updated to v6 (Supports Python 3.12)
               with:
                   python-version: '3.12'   # Specify the Python version to use
             
@@ -35,7 +35,6 @@ jobs:
             # Step 4: Run tests
             - name: Run tests
               run: |
-                  pytest tests/   # Run tests using pytest
                   pytest --maxfail=1 --disable-warnings -q || echo "Tests failed or no tests found, skipping..."   # Run tests with specific options
             
             # Step 5: Build Docker image
