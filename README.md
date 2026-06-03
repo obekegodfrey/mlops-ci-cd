@@ -168,7 +168,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 #Copy the source code
 COPY src/ ./src/   
-COPY iris_model.pkl /app/iris_model.pkl
+COPY src/iris_model.pkl /app/iris_model.pkl
 
 #Expose the port for the FastAPI app
 EXPOSE 8000 
@@ -214,7 +214,7 @@ COPY --from=builder /install /usr/local
 
 # Copy application source code and the pre-trained model artifact
 COPY src/ ./src/
-COPY iris_model.pkl /app/iris_model.pkl
+COPY src/iris_model.pkl /app/iris_model.pkl
 
 # Expose the application port
 EXPOSE 8000
