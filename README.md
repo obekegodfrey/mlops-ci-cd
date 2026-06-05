@@ -415,7 +415,7 @@ jobs:
                 ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
                 ECR_REPOSITORY=mlops_ci_cd_iris_reg
                 IMAGE_TAG=latest
-                docker tag mlops_ci_cd_iris:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                docker tag mlops_ci_cd $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  
 ```
 
