@@ -49,15 +49,24 @@ jobs:
               run: |
                   docker build -t mlops-ci-cd .   # Build a Docker image
             
-            # Step 6: Log in to Docker Hub
-            - name: Log in to Docker Hub   # Use Docker login action to authenticate with Docker Hub        
-              uses: docker/login-action@v4  #  Updated to v4 (Supports Node 24+) 
+            # Step 6: Configure AWS access keys stored in GitHub Secrets
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
               with:
-                  username: ${{ secrets.DOCKER_USERNAME }}   # Use Docker Hub username from secrets
-                  password: ${{ secrets.DOCKER_PASSWORD }}   # Use Docker Hub password from secrets
-            
-            # Step 7: Push Docker image to Docker Hub
-            - name: Push Docker image
-              run: |
-                  
-                  docker push ${{ secrets.DOCKER_USERNAME }}/mlops-ci-cd:latest
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION }}
+
+            # Step 7: Authenticate Docker to push to Amazon ECR
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v4
+
+            # Step 8: Tag and push image to ECR repo
+            - name: Tag and Push to ECR
+              run: |                            
+                ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+                ECR_REPOSITORY=mlops_ci_cd_iris_reg
+                IMAGE_TAG=latest
+                docker tag mlops_ci_cd_iris:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  

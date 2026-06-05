@@ -321,3 +321,112 @@ git commit -m "Added test step in CI/CD pipeline"
 # Push changes to the main branch (triggers CI/CD pipeline)
 git push origin main
 ```
+
+## Step 4: Warehouse → Amazon ECR
+
+Just like factories store products in warehouses, we store Docker images in AWS Elastic Container Registry
+
+### 4.1 Create IAM User
+- IAM → Users → Add user mlops-github → enable Programmatic access.
+- Attach AmazonEC2ContainerRegistryFullAccess + AmazonEC2FullAccess (or custom restricted policy).
+- Download .csv with AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY.
+
+### 4.2 Create ECR Repository
+- ECR → Repositories → Create → name mlops_ci_cd_iris_reg (private).
+
+Note image URI,e.g
+```
+581049839127.dkr.ecr.us-east-1.amazonaws.com/mlops_ci_cd_iris_reg
+```
+
+### 4.3 Add GitHub Secrets
+Repo → Settings → Secrets → Actions → New secret:
+
+### 4.4 update GitHub Actions 
+In .github/workflows/ci-cd.yaml:
+```
+name: CI Pipeline   # Name of the workflow
+
+on:
+    push:
+        branches: [ "main" ]   # Trigger the workflow on push to the main branch
+    pull_request:
+        branches: [ "main" ]   # Trigger the workflow on pull request to the main branch
+
+permissions:
+    contents: write   # Grant write permissions to the contents of the repository
+    packages: write   # Grant write permissions to the packages in the repository
+
+jobs:
+    build:
+        runs-on: ubuntu-latest   # Use the latest version of Ubuntu as the runner
+
+        steps:
+            # Step 1: Check out the code
+            - name: Checkout code
+              uses: actions/checkout@v6 #  Updated to v6 (Supports Node 24+)
+            
+            # Step 2: Set up Python environment
+            - name: Set up Python
+              uses: actions/setup-python@v6   #  Updated to v6 (Supports Python 3.12)
+              with:
+                  python-version: '3.12'   # Specify the Python version to use
+            
+            # Step 3: Install dependencies
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip   # Upgrade pip
+                  pip install -r requirements.txt   # Install dependencies from requirements.txt
+                  pip install pytest   # Install pytest for testing
+            
+            # Step 4: Run tests
+            - name: Run tests
+              run: |
+                  pytest --maxfail=1 --disable-warnings -q || echo "Tests failed or no tests found, skipping..."   # Run tests with specific options
+            # Train the model so iris_model.pkl is created in the runner environment
+            - name: Train model
+              run: |
+                  python src/model.py
+                  echo "=== Root Directory Files ==="
+                  ls -la
+                  echo "=== Src Directory Files ==="
+                  ls -la src/
+            # Step 5: Build Docker image
+            - name: Build Docker image # Build a Docker image using the Dockerfile in the repository
+              run: |
+                  docker build -t mlops-ci-cd .   # Build a Docker image
+            
+            # Step 6: Configure AWS access keys stored in GitHub Secrets
+            - name: Configure AWS credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+             aws-region: ${{ secrets.AWS_REGION }}
+
+            # Step 7: Authenticate Docker to push to Amazon ECR
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v2
+
+            # Step 8: Tag and push image to ECR repo
+            - name: Tag and Push to ECR
+              run: |                            
+                ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+                ECR_REPOSITORY=mlops_ci_cd_iris_reg
+                IMAGE_TAG=latest
+                docker tag mlops_ci_cd_iris:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  
+```
+
+### 4.5 Commands to Trigger CI
+```
+# Stage all changes in your repo
+git add .
+
+# Commit changes with a descriptive message
+git commit -m "Added test step in CI/CD pipeline"
+
+# Push changes to the main branch (triggers CI/CD pipeline)
+git push origin mai
+```
